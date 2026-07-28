@@ -1,14 +1,12 @@
-# protein
+# Protein
 
-A terminal UI for macOS `caffeinate(8)`, driven by keyboard **and** mouse. Build a
-sleep assertion in a form, launch it, watch it count down, kill it. Binary name:
-**`caf`**.
+**Protein** is a terminal UI for macOS `caffeinate(8)`. It makes creating and managing sleep assertions a lot easier, without having to remember a bunch of flags.
 
-`caffeinate` is a great tool with a forgettable flag set and no visibility. Once
-you background one you have no idea it's there. `protein` turns the whole thing
-into a list you can see: every assertion holding your Mac awake right now —
-**including the ones you started from a shell or that some app started for you** —
-with its PID, how long it has left, and the exact command behind it.
+Create a sleep assertion from a simple form, launch it, watch the countdown, and stop it whenever you want. The binary is called **`caf`**.
+
+`caffeinate` is an awesome tool, but once you start one in the background, it is easy to forget it is even running. Protein gives you a live view of every sleep assertion currently keeping your Mac awake. That includes assertions you started yourself, ones launched from another terminal, and ones created by other applications.
+
+For each assertion you can see the PID, how much time is left, the assertion type, and the exact command that created it, all in one place.
 
 Built with [`ratatui`](https://ratatui.rs) + `crossterm`, Catppuccin Mocha palette.
 
