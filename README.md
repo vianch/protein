@@ -477,7 +477,9 @@ isn't up yet is legitimate.
 protein/
 ├── Cargo.toml
 ├── Formula/proteine.rb      # Homebrew formula
-├── docs/screenshots/        # screenshot placeholders + capture notes
+├── docs/
+│   ├── images/              # logo
+│   └── screenshots/         # screenshot placeholders + capture notes
 └── src/
     ├── main.rs              # arg parsing, terminal lifecycle, async event loop
     ├── app.rs               # App state, Action enum, handle_action reducer
