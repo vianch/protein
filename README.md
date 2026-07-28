@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/protein.png" alt="Protein Logo" width="128" height="128">
+  <img src="docs/images/banner.png" alt="Protein" height="128">
 </p>
 
 # Protein
