@@ -98,10 +98,11 @@ table — none of that exists elsewhere.
 
 ### Homebrew
 
-Tap this repo, then install the formula:
+Tap this repo, trust it, then install the formula:
 
 ```bash
 brew tap vianch/protein https://github.com/vianch/protein
+brew trust vianch/protein
 brew install proteine
 proteine
 ```
