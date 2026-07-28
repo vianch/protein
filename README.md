@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/protein.png" alt="Protein Logo" width="128" height="128">
+</p>
+
 # Protein
 
 **Protein** is a terminal UI for macOS `caffeinate(8)`. It makes creating and managing sleep assertions a lot easier, without having to remember a bunch of flags.
