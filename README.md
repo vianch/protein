@@ -14,13 +14,6 @@ Built with [`ratatui`](https://ratatui.rs) + `crossterm`, Catppuccin Mocha palet
 
 ---
 
-## Screenshots
-
-> **Placeholder — drop real captures into `docs/screenshots/`.**
-> Filenames, sizes and the exact keystrokes to reproduce each view are listed in
-> [`docs/screenshots/README.md`](docs/screenshots/README.md). Until then the ASCII
-> renderings below are real output, captured from the running binary.
-
 ### Session list
 
 ![Session list](docs/screenshots/01-session-list.png)
@@ -69,20 +62,6 @@ Built with [`ratatui`](https://ratatui.rs) + `crossterm`, Catppuccin Mocha palet
 │                                                                │
 │ [ Save & Launch ]   [ Save Only ]   [ Cancel ]                 │
 ╰─Tab move  • Space toggle  • Ctrl+S save & launch  • Esc cancel─╯
-```
-
-### PID picker
-
-![PID picker](docs/screenshots/03-pid-picker.png)
-
-```
-╭ Pick a process ───────────────────────────────────────────────────────────╮
-│ filter code█                                                              │
-│     PID  NAME                                           MEM               │
-│   81500  com.apple.CodeSigningHelper                   0 MB               │
-│   33787  VTDecoderXPCService                           0 MB               │
-│   59981  VTDecoderXPCService                           7 MB               │
-╰─Type to filter  • ↑/↓ move  • Enter select  • Esc back────────────────────╯
 ```
 
 ### Session details
