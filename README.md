@@ -96,6 +96,21 @@ Built with [`ratatui`](https://ratatui.rs) + `crossterm`, Catppuccin Mocha palet
 Requires macOS. It shells out to `caffeinate` and `pmset`, and reads the process
 table — none of that exists elsewhere.
 
+### One-liner
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vianch/protein/main/install.sh | sh
+```
+
+Builds from source with `cargo install` into `~/.cargo/bin/caf`. Needs stable
+Rust; the script tells you how to get it if `cargo` is missing.
+
+Pin a tag by setting the env var on `sh`, not on `curl`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/vianch/protein/main/install.sh | PROTEIN_VERSION=v0.1.0 sh
+```
+
 ### Homebrew
 
 Tap this repo, trust it, then install the formula:
