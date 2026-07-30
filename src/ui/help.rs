@@ -16,6 +16,7 @@ const KEYS: &[(&str, &str)] = &[
     ("n", "New session"),
     ("e", "Edit selected"),
     ("k / Ctrl+C", "Kill selected (SIGTERM, SIGKILL after 500ms)"),
+    ("Shift+D", "Delete selected (stopped sessions only)"),
     ("Shift+R", "Restart with the same config"),
     ("d", "Duplicate config into a new form"),
     (
@@ -109,7 +110,10 @@ pub fn draw_details(frame: &mut Frame, app: &mut App, area: Rect) {
     let mut lines = vec![
         row(
             "Name",
-            Span::styled(session.name.clone(), styles::background().fg(styles::TEXT)),
+            Span::styled(
+                session.name.clone(),
+                styles::background().fg(styles::theme().text),
+            ),
         ),
         row(
             "Status",
@@ -119,21 +123,21 @@ pub fn draw_details(frame: &mut Frame, app: &mut App, area: Rect) {
             "Command",
             Span::styled(
                 session.command_line(),
-                styles::background().fg(styles::TEAL),
+                styles::background().fg(styles::theme().teal),
             ),
         ),
         row(
             "Flags",
             Span::styled(
                 session.flags.label(),
-                styles::background().fg(styles::PEACH),
+                styles::background().fg(styles::theme().peach),
             ),
         ),
         row(
             "Target",
             Span::styled(
                 session.target.label(),
-                styles::background().fg(styles::PEACH),
+                styles::background().fg(styles::theme().peach),
             ),
         ),
         row(

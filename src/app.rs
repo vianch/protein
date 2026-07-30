@@ -56,6 +56,9 @@ pub enum Action {
     EditSelected,
     DuplicateSelected,
     KillSelected,
+    /// Drop the selected row. A stopped session has no process to kill, so
+    /// without this it can never leave the list.
+    DeleteSelected,
     RestartSelected,
     LaunchSelected,
     /// Rescan the process table for externally started `caffeinate` sessions.
@@ -93,6 +96,7 @@ pub const FOOTER_BUTTONS: &[(&str, Action)] = &[
     ("[N]ew", Action::NewSession),
     ("[E]dit", Action::EditSelected),
     ("[K]ill", Action::KillSelected),
+    ("[Shift+D]elete", Action::DeleteSelected),
     ("[Shift+R]estart", Action::RestartSelected),
     ("[D]uplicate", Action::DuplicateSelected),
     ("[R]efresh", Action::Refresh),
@@ -615,6 +619,9 @@ impl App {
             // `k` is Kill, so vim-up is gone and the arrow keys are the only way
             // up. `r` is Refresh, so Restart moved to Shift+R.
             KeyCode::Char('k') => Action::KillSelected,
+            // Shift+D, not `x` (an old Kill reflex) and not Delete (40% keyboards
+            // have no dedicated Del key).
+            KeyCode::Char('D') => Action::DeleteSelected,
             KeyCode::Char('r') | KeyCode::F(5) => Action::Refresh,
             KeyCode::Char('R') => Action::RestartSelected,
             KeyCode::Char('d') => Action::DuplicateSelected,
@@ -752,6 +759,7 @@ impl App {
             Action::DuplicateSelected => self.open_form_from_selection(false),
 
             Action::KillSelected => self.kill_selected(),
+            Action::DeleteSelected => self.delete_selected(),
             Action::RestartSelected => self.restart_selected(),
             Action::LaunchSelected => self.launch_selected(),
 
@@ -954,6 +962,29 @@ impl App {
             }
             Err(error) => self.message = Some((error.to_string(), true)),
         }
+        None
+    }
+
+    /// Remove the selected session from the list. Refuses while it is still
+    /// running — kill it first, so a keystroke cannot orphan a live
+    /// `caffeinate`. External rows are not ours to delete: they come back on the
+    /// next rescan anyway.
+    fn delete_selected(&mut self) -> Option<Action> {
+        let Some(index) = self.selected_index() else {
+            self.message = Some(("No session selected".to_string(), true));
+            return None;
+        };
+        if self.sessions[index].is_running() {
+            self.message = Some(("Kill the session before deleting it".to_string(), true));
+            return None;
+        }
+        if self.sessions[index].external {
+            self.message = Some(("External sessions cannot be deleted".to_string(), true));
+            return None;
+        }
+        let name = self.sessions.remove(index).name;
+        self.clamp_selection();
+        self.message = Some((format!("Deleted \u{201c}{name}\u{201d}"), false));
         None
     }
 
@@ -1161,6 +1192,43 @@ mod tests {
         form
     }
 
+    fn stopped(name: &str) -> CaffeineSession {
+        let mut session = CaffeineSession::new(
+            name.to_string(),
+            CaffeinateFlags::default(),
+            Target::Indefinite,
+        );
+        session.status = SessionStatus::Stopped;
+        session
+    }
+
+    #[test]
+    fn delete_removes_a_stopped_session_and_keeps_the_selection_valid() {
+        let mut app = App::new();
+        app.sessions = vec![stopped("first"), stopped("second")];
+        app.table_state.select(Some(1));
+
+        app.dispatch(Action::DeleteSelected);
+
+        assert_eq!(app.sessions.len(), 1);
+        assert_eq!(app.sessions[0].name, "first");
+        assert_eq!(app.table_state.selected(), Some(0));
+    }
+
+    #[test]
+    fn delete_refuses_while_the_session_is_running() {
+        let mut app = App::new();
+        let mut running = stopped("live");
+        running.status = SessionStatus::Running;
+        app.sessions = vec![running];
+        app.table_state.select(Some(0));
+
+        app.dispatch(Action::DeleteSelected);
+
+        assert_eq!(app.sessions.len(), 1);
+        assert!(app.message.as_ref().is_some_and(|(_, is_error)| *is_error));
+    }
+
     #[test]
     fn name_is_required() {
         let mut form = form_with(TargetKind::Indefinite, "");
@@ -1300,6 +1368,7 @@ mod tests {
                 .expect("every footer label brackets its key");
             let code = match promised {
                 "Shift+R" => KeyCode::Char('R'),
+                "Shift+D" => KeyCode::Char('D'),
                 other => KeyCode::Char(other.chars().next().unwrap().to_ascii_lowercase()),
             };
             assert_eq!(

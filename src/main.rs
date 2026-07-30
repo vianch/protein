@@ -31,9 +31,10 @@ USAGE:
     caf [OPTIONS]
 
 OPTIONS:
-    --ascii        Use ASCII glyphs instead of box-drawing characters
-    -h, --help     Print this help
-    -V, --version  Print version
+    --ascii          Use ASCII glyphs instead of box-drawing characters
+    --theme <name>   Colour theme: mocha (default), purple
+    -h, --help       Print this help
+    -V, --version    Print version
 
 Sessions are stored in ~/.config/protein/sessions.json.
 Press ? inside the app for the full keybinding and mouse reference.";
@@ -41,9 +42,18 @@ Press ? inside the app for the full keybinding and mouse reference.";
 #[tokio::main]
 async fn main() -> Result<()> {
     let mut ascii = false;
-    for argument in std::env::args().skip(1) {
+    let mut theme = std::env::var("PROTEIN_THEME").ok();
+    let mut arguments = std::env::args().skip(1);
+    while let Some(argument) = arguments.next() {
         match argument.as_str() {
             "--ascii" => ascii = true,
+            "--theme" => match arguments.next() {
+                Some(name) => theme = Some(name),
+                None => {
+                    eprintln!("caf: --theme needs a name ({})", ui::styles::theme_names());
+                    std::process::exit(2);
+                }
+            },
             "-h" | "--help" => {
                 println!("{USAGE}");
                 return Ok(());
@@ -59,6 +69,15 @@ async fn main() -> Result<()> {
         }
     }
     ui::styles::set_ascii(ascii || std::env::var_os("PROTEIN_ASCII").is_some());
+    if let Some(name) = &theme {
+        if !ui::styles::set_theme(name) {
+            eprintln!(
+                "caf: unknown theme `{name}` (available: {})",
+                ui::styles::theme_names()
+            );
+            std::process::exit(2);
+        }
+    }
 
     let mut terminal = enter_terminal()?;
     let result = run(&mut terminal).await;

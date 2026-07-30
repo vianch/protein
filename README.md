@@ -12,7 +12,8 @@ Create a sleep assertion from a simple form, launch it, watch the countdown, and
 
 For each assertion you can see the PID, how much time is left, the assertion type, and the exact command that created it, all in one place.
 
-Built with [`ratatui`](https://ratatui.rs) + `crossterm`, Catppuccin Mocha palette.
+Built with [`ratatui`](https://ratatui.rs) + `crossterm`. Ships two themes:
+Catppuccin Mocha (default) and Shades of Purple — see [Themes](#themes).
 
 ---
 
@@ -34,7 +35,7 @@ Built with [`ratatui`](https://ratatui.rs) + `crossterm`, Catppuccin Mocha palet
 │  6   zsh                          -i             15m                91765   ◆ EXTERNAL  ░░░░░░░░░░ 0:14:58 │
 └────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ [N]ew   [E]dit   [K]ill   [Shift+R]estart   [D]uplicate   [R]efresh   [Q]uit   [?]Help                     │
+│ [N]ew   [E]dit   [K]ill   [Shift+D]elete   [Shift+R]estart   [D]uplicate   [R]efresh   [Q]uit   [?]Help    │
 └────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -139,17 +140,68 @@ Needs stable Rust (built and tested on 1.96).
 ### Options
 
 ```
-caf [--ascii] [-h|--help] [-V|--version]
+caf [--ascii] [--theme <name>] [-h|--help] [-V|--version]
 ```
 
 | Flag | Effect |
 |---|---|
 | `--ascii` | Swap box-drawing glyphs for `* + ! - =`, `[x]`, `(*)`, `>` |
+| `--theme <name>` | Colour theme: `mocha` (default) or `purple` |
 | `-h`, `--help` | Usage and exit |
 | `-V`, `--version` | Version and exit |
 
 `PROTEIN_ASCII=1` does the same as `--ascii`. Useful over a plain-ASCII terminal,
 a serial console, or anywhere the block glyphs render as tofu.
+
+---
+
+## Themes
+
+Two built-in palettes:
+
+| Name | Palette |
+|---|---|
+| `mocha` | [Catppuccin Mocha](https://github.com/catppuccin/catppuccin) — the default |
+| `purple` | [Shades of Purple](https://github.com/ahmadawais/shades-of-purple-vscode) |
+
+Pick one per launch, or export it once and forget about it:
+
+```bash
+caf --theme purple           # this run only
+caf --theme mocha            # the default, spelled out
+
+export PROTEIN_THEME=purple  # in ~/.zshrc — every launch
+```
+
+`--theme` wins over `PROTEIN_THEME`. An unknown name exits `2` and lists what is
+available rather than silently falling back:
+
+```
+caf: unknown theme `nope` (available: mocha, purple)
+```
+
+The theme is resolved once before the first frame; there is no in-app switcher.
+
+### Adding a theme
+
+Every theme fills the same fifteen semantic slots (the names follow Catppuccin's
+vocabulary because that was the first one). In [`src/ui/styles.rs`](src/ui/styles.rs),
+add a `const` and list it in `THEMES`:
+
+```rust
+const NORD: Theme = Theme {
+    name: "nord",
+    base: Color::Rgb(0x2e, 0x34, 0x40),
+    // ... mantle, surface0, surface1, overlay0, subtext0, text,
+    //     green, blue, red, yellow, peach, mauve, lavender, teal
+};
+
+const THEMES: &[&Theme] = &[&MOCHA, &PURPLE, &NORD];
+```
+
+Nothing else changes: `--help`, the error message and the flag parser all read
+`THEMES`. Every widget goes through `styles::theme()`, so no call site needs
+touching.
 
 ---
 
@@ -166,6 +218,7 @@ cargo run --release
 
 # Pass flags through cargo with --
 cargo run --release -- --ascii
+cargo run --release -- --theme purple
 cargo run --release -- --version
 
 # Or run the built binary directly.
@@ -360,6 +413,7 @@ Your own sessions always sort above external ones, so a machine with six stray
 | `n` | New session |
 | `e` | Edit selected |
 | `k` or `Ctrl+C` | Kill selected |
+| `Shift+D` | Delete selected (stopped sessions only) |
 | `Shift+R` | Restart with the same config |
 | `d` | Duplicate config into a new form |
 | `r`, `F5` or `Ctrl+R` | Rescan for external `caffeinate` processes |
@@ -367,6 +421,11 @@ Your own sessions always sort above external ones, so a machine with six stray
 | `h` / `l` (footer focused) | Move between footer buttons |
 | `?` | Help |
 | `q` / `Esc` | Quit, or close the open modal |
+
+Deleting is `Shift+D`, and only works on a session that is not running: a stopped
+or finished row has no process left to kill, so without a delete it could never
+leave the list. Kill it first if it is live. External rows are not deletable —
+they come back on the next rescan anyway.
 
 Two deliberate consequences of `k` = Kill and `r` = Refresh:
 
@@ -376,7 +435,9 @@ Two deliberate consequences of `k` = Kill and `r` = Refresh:
 - **Restart is `Shift+R`**, because lowercase `r` refreshes. The footer button
   reads `[Shift+R]estart` so the key is never in doubt.
 
-`x` is unbound. Inside the form `k` types the letter k — the form has its own
+`x` stays unbound on purpose — Kill used to live there, and a stale reflex must not
+delete a row. `Delete` is not bound either, so the binding works on 40% keyboards
+with no dedicated Del key. Inside the form `k` types the letter k — the form has its own
 keymap and no destructive shortcut.
 
 ### Form
@@ -507,7 +568,7 @@ protein/
         ├── table.rs         # header, session table, footer buttons
         ├── form.rs          # new/edit modal, PID picker (+ render tests)
         ├── help.rs          # help and details modals
-        └── styles.rs        # Catppuccin Mocha palette, glyphs
+        └── styles.rs        # themes (mocha, purple), shared styles, glyphs
 ```
 
 ### One reducer, two input devices

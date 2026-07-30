@@ -48,7 +48,7 @@ pub fn draw_header(frame: &mut Frame, app: &mut App, area: Rect) {
         spans.push(Span::styled("  |  ", styles::dim()));
         spans.push(Span::styled(
             format!("{external} external"),
-            Style::default().fg(styles::MAUVE),
+            Style::default().fg(styles::theme().mauve),
         ));
     }
     spans.push(Span::styled("  |  ", styles::dim()));
@@ -143,18 +143,18 @@ pub fn draw_table(frame: &mut Frame, app: &mut App, area: Rect) {
                 Cell::from(Span::styled(
                     utils::truncate(&session.name, inner.width as usize / 3),
                     if session.is_running() {
-                        styles::background().fg(styles::TEXT)
+                        styles::background().fg(styles::theme().text)
                     } else {
                         styles::label()
                     },
                 )),
                 Cell::from(Span::styled(
                     session.flags.label(),
-                    styles::background().fg(styles::TEAL),
+                    styles::background().fg(styles::theme().teal),
                 )),
                 Cell::from(Span::styled(
                     utils::truncate(&session.target.label(), TARGET_WIDTH as usize),
-                    styles::background().fg(styles::PEACH),
+                    styles::background().fg(styles::theme().peach),
                 )),
                 Cell::from(Span::styled(
                     session
@@ -162,7 +162,7 @@ pub fn draw_table(frame: &mut Frame, app: &mut App, area: Rect) {
                         .map(|pid| pid.to_string())
                         .unwrap_or_else(|| "-".to_string()),
                     if session.pid.is_some() {
-                        styles::background().fg(styles::SUBTEXT0)
+                        styles::background().fg(styles::theme().subtext0)
                     } else {
                         styles::dim()
                     },
@@ -246,9 +246,9 @@ fn time_cell(session: &crate::models::CaffeineSession) -> Line<'static> {
         Some(progress) => {
             let remaining = session.remaining_seconds().unwrap_or(0);
             let colour = if progress > 0.9 {
-                styles::YELLOW
+                styles::theme().yellow
             } else {
-                styles::GREEN
+                styles::theme().green
             };
             Line::from(vec![
                 Span::styled(

@@ -305,7 +305,7 @@ fn text_input<'a>(value: &str, placeholder: &str, focused: bool, width: usize) -
     let style = if focused {
         styles::focused_field()
     } else {
-        styles::background().fg(styles::TEXT)
+        styles::background().fg(styles::theme().text)
     };
 
     if value.is_empty() && !focused {
@@ -397,9 +397,9 @@ pub fn draw_picker(frame: &mut Frame, app: &mut App, area: Rect) {
                 entry.memory_mb
             ),
             if selected {
-                styles::selected_row().fg(styles::TEXT)
+                styles::selected_row().fg(styles::theme().text)
             } else {
-                styles::background().fg(styles::SUBTEXT0)
+                styles::background().fg(styles::theme().subtext0)
             },
         ));
         let row_area = Rect {
