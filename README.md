@@ -118,12 +118,12 @@ Tap this repo, trust it, then install the formula:
 ```bash
 brew tap vianch/protein https://github.com/vianch/protein
 brew trust vianch/protein
-brew install proteine
-proteine
+brew install protein
+protein
 ```
 
-The formula ([`Formula/proteine.rb`](Formula/proteine.rb)) builds with `cargo
-install` and symlinks the `caf` binary to `proteine`, so both commands work.
+The formula ([`Formula/protein.rb`](Formula/protein.rb)) builds with `cargo
+install` and symlinks the `caf` binary to `protein`, so both commands work.
 
 ### From source
 
@@ -491,7 +491,7 @@ isn't up yet is legitimate.
 ```
 protein/
 ├── Cargo.toml
-├── Formula/proteine.rb      # Homebrew formula
+├── Formula/protein.rb      # Homebrew formula
 ├── docs/
 │   ├── images/              # logo
 │   └── screenshots/         # screenshot placeholders + capture notes
