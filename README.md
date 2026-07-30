@@ -109,7 +109,7 @@ Rust; the script tells you how to get it if `cargo` is missing.
 Pin a tag by setting the env var on `sh`, not on `curl`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vianch/protein/main/install.sh | PROTEIN_VERSION=v0.1.0 sh
+curl -fsSL https://raw.githubusercontent.com/vianch/protein/main/install.sh | PROTEIN_VERSION=v0.2.0 sh
 ```
 
 ### Homebrew

@@ -1,6 +1,6 @@
 [package]
 name = "protein"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Terminal UI to build, launch, track and kill macOS caffeinate sessions"
 license = "MIT"
