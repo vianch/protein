@@ -1,4 +1,4 @@
-class Proteine < Formula
+class Protein < Formula
   desc "Terminal UI to build, launch, track and kill macOS caffeinate sessions"
   homepage "https://github.com/vianch/protein"
   url "https://github.com/vianch/protein/archive/refs/tags/v0.1.0.tar.gz"
@@ -9,10 +9,10 @@ class Proteine < Formula
 
   def install
     system "cargo", "install", *std_cargo_args(path: ".")
-    bin.install_symlink bin/"caf" => "proteine"
+    bin.install_symlink bin/"caf" => "protein"
   end
 
   test do
-    assert_match "caf", shell_output("#{bin}/proteine --version")
+    assert_match "caf", shell_output("#{bin}/protein --version")
   end
 end
